@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Network Security Config — SentinelNode Elite
+
+    ВАЖНО для HTTPS MITM:
+    На Android 7+ (API 24+) пользовательские CA по умолчанию НЕ доверяются
+    приложениям. Для работы MITM необходимо ОДНО из следующего:
+    1. Установить CA как системный (требует root/system partition write)
+    2. Быть Device Owner и установить через DevicePolicyManager.installCaCert()
+    3. Целевые приложения должны иметь свой network_security_config с
+       <certificates src="user"/> — это возможно только для отлаживаемых/dev-сборок
+
+    Данный конфиг разрешает user-certs только для debug-сборок самого приложения.
+    Для инспекции трафика ДРУГИХ приложений нужен системный CA или root.
+-->
+<network-security-config>
+
+    <!-- В debug-сборках приложение доверяет user-установленным CA -->
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </debug-overrides>
+
+    <!-- В release-сборках — только системные CA -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+</network-security-config>

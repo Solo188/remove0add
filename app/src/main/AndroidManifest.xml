@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    SentinelNode Elite — AndroidManifest.xml
+    v2.0 — DPI + HTTPS MITM + CertInstallActivity
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.flow.validator">
+
+    <!-- ================================================================== -->
+    <!-- PERMISSIONS                                                          -->
+    <!-- ================================================================== -->
+
+    <uses-permission android:name="android.permission.BIND_DEVICE_ADMIN" />
+    <uses-permission android:name="android.permission.BIND_VPN_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_ADMINS" />
+
+    <!-- KeyChain cert install — no extra permission needed, system handles it -->
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+
+    <!-- ================================================================== -->
+    <!-- APPLICATION                                                          -->
+    <!-- ================================================================== -->
+
+    <application
+        android:allowBackup="false"
+        android:label="SentinelNode"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.SentinelNode"
+        android:usesCleartextTraffic="false"
+        android:networkSecurityConfig="@xml/network_security_config">
+
+        <!-- ============================================================== -->
+        <!-- LAUNCHER ACTIVITY — Dashboard                                   -->
+        <!-- ============================================================== -->
+
+        <activity
+            android:name=".ui.DashboardActivity"
+            android:exported="true"
+            android:label="SentinelNode"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- ============================================================== -->
+        <!-- CERTIFICATE INSTALL ACTIVITY                                    -->
+        <!-- ============================================================== -->
+
+        <activity
+            android:name=".ui.CertInstallActivity"
+            android:exported="false"
+            android:label="Install Certificate"
+            android:parentActivityName=".ui.DashboardActivity" />
+
+        <!-- ============================================================== -->
+        <!-- DEVICE ADMIN RECEIVER                                            -->
+        <!-- ============================================================== -->
+
+        <receiver
+            android:name=".admin.AdminReceiver"
+            android:label="SentinelNode Policy"
+            android:description="@string/admin_description"
+            android:permission="android.permission.BIND_DEVICE_ADMIN"
+            android:exported="true">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin_rules" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Boot receiver -->
+        <receiver
+            android:name=".service.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- ============================================================== -->
+        <!-- VPN SERVICE                                                      -->
+        <!-- ============================================================== -->
+
+        <service
+            android:name=".vpn.ValidatorVpnService"
+            android:permission="android.permission.BIND_VPN_SERVICE"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice">
+            <intent-filter>
+                <action android:name="android.net.VpnService" />
+            </intent-filter>
+        </service>
+
+        <!-- ============================================================== -->
+        <!-- MAIN SERVICE                                                     -->
+        <!-- ============================================================== -->
+
+        <service
+            android:name=".service.MainService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice"
+            android:stopWithTask="false" />
+
+    </application>
+
+</manifest>
